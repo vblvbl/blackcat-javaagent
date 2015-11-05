@@ -19,7 +19,7 @@ public abstract class BlackcatJavaAgentInterceptor extends BlackcatJavaAgentCall
      * @param arg Second token (split by ";") in the agent options after the
      *            Interceptor class name.
      */
-    protected abstract void init(String arg);
+    public abstract void init(String arg);
 
     /**
      * When to instrument a class based on its name.
@@ -32,7 +32,7 @@ public abstract class BlackcatJavaAgentInterceptor extends BlackcatJavaAgentCall
      * @param byteCode  the input byte buffer in class file format
      * @return 是否拦截类
      */
-    protected abstract boolean interceptClass(String className, byte[] byteCode);
+    public abstract boolean interceptClass(String className, byte[] byteCode);
 
     /**
      * When to instrument a method of a class based on their ASM representation
@@ -41,5 +41,5 @@ public abstract class BlackcatJavaAgentInterceptor extends BlackcatJavaAgentCall
      * @param mn 方法节点
      * @return 是否拦截方法
      */
-    protected abstract boolean interceptMethod(ClassNode cn, MethodNode mn);
+    public abstract boolean interceptMethod(ClassNode cn, MethodNode mn);
 }

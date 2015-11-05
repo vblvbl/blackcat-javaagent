@@ -1,7 +1,9 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.logging;
+
+import com.github.bingoohuang.blackcat.javaagent.BlackcatCreateTransformedClassFile;
 
 @BlackcatCreateTransformedClassFile
-public class LoggingClass {
+public class DemoClass {
 
     public static String sayHello(String name) {
         return "Hello " + name + ", you fool, I love youuu! " + joinTheJoyRide();

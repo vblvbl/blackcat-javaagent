@@ -20,19 +20,19 @@ public class BlackcatJavaAgentInterceptorAdapter extends BlackcatJavaAgentInterc
     }
 
     @Override
-    public void doOnStart(Object source, Object[] arg, String executionId) {
+    protected void doOnStart(Object source, Object[] arg, String executionId) {
     }
 
     @Override
-    public void doOnThrowableThrown(Object source, Throwable throwable, String executionId) {
+    protected void doOnThrowableThrown(Object source, Throwable throwable, String executionId) {
     }
 
     @Override
-    public void doOnThrowableUncaught(Object source, Throwable throwable, String executionId) {
+    protected void doOnThrowableUncaught(Object source, Throwable throwable, String executionId) {
     }
 
     @Override
-    public void doOnFinish(Object source, Object result, String executionId) {
+    protected void doOnFinish(Object source, Object result, String executionId) {
     }
 
 }
