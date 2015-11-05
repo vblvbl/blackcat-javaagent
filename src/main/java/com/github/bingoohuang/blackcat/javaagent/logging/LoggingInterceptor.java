@@ -51,16 +51,16 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
         File file = getFile(rt);
         trace(file, "#onStart:");
         trace(file, "#Source: " + rt.source);
-        trace(file, "#Start: " + new Date(rt.start));
+        trace(file, "#Start: " + new Date(rt.startNano));
         trace(file, "#Parameters:" + toJSON(rt.args));
     }
 
     @Override
     protected void onThrowableCaught(BlackcatMethodRt rt) {
-        long cost = System.currentTimeMillis() - rt.start;
+        long cost = System.nanoTime() - rt.startNano;
         File file = getFile(rt);
         trace(file, "#onThrowableCaught:");
-        trace(file, "#Elapsed: " + cost + " ms");
+        trace(file, "#Elapsed: " + cost + " ns");
         trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
         trace(file, "#Catch:" + rt.throwableCaught);
         trace(file, "#Catch JSON:" + toJSON(rt.throwableCaught));
@@ -68,10 +68,10 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onThrowableUncaught(BlackcatMethodRt rt) {
-        long cost = System.currentTimeMillis() - rt.start;
+        long cost = System.nanoTime() - rt.startNano;
         File file = getFile(rt);
         trace(file, "#onThrowableUncaught:");
-        trace(file, "#Elapsed: " + cost + " ms");
+        trace(file, "#Elapsed: " + cost + " ns");
         trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
         trace(file, "#Thrown:" + rt.throwableUncaught);
         trace(file, "#ThrownJSON:" + toJSON(rt.throwableCaught));
@@ -80,10 +80,10 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onFinish(BlackcatMethodRt rt) {
-        long cost = System.currentTimeMillis() - rt.start;
+        long cost = System.nanoTime() - rt.startNano;
         File file = getFile(rt);
         trace(file, "#onFinish:");
-        trace(file, "#Elapsed: " + cost + " ms");
+        trace(file, "#Elapsed: " + cost + " ns");
         trace(file, "#Returned:" + toJSON(rt.result));
         trace(file, "\n\n");
     }
