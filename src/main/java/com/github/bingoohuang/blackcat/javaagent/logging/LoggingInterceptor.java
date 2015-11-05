@@ -52,7 +52,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
         trace(file, "#onStart:");
         trace(file, "#Source: " + rt.source);
         trace(file, "#Start: " + new Date(rt.start));
-        trace(file, "#Parameters:" + toString(rt.args));
+        trace(file, "#Parameters:" + toJSON(rt.args));
     }
 
     @Override
@@ -61,7 +61,9 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
         File file = getFile(rt);
         trace(file, "#onThrowableCaught:");
         trace(file, "#Elapsed: " + cost + " ms");
-        trace(file, "#Catch:" + toString(rt.throwable));
+        trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
+        trace(file, "#Catch:" + rt.throwableCaught);
+        trace(file, "#Catch JSON:" + toJSON(rt.throwableCaught));
     }
 
     @Override
@@ -70,7 +72,9 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
         File file = getFile(rt);
         trace(file, "#onThrowableUncaught:");
         trace(file, "#Elapsed: " + cost + " ms");
-        trace(file, "#Thrown:" + toString(rt.throwable));
+        trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
+        trace(file, "#Thrown:" + rt.throwableUncaught);
+        trace(file, "#ThrownJSON:" + toJSON(rt.throwableCaught));
         trace(file, "\n\n");
     }
 
@@ -80,7 +84,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
         File file = getFile(rt);
         trace(file, "#onFinish:");
         trace(file, "#Elapsed: " + cost + " ms");
-        trace(file, "#Returned:" + toString(rt.result));
+        trace(file, "#Returned:" + toJSON(rt.result));
         trace(file, "\n\n");
     }
 
@@ -125,7 +129,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
         return ret;
     }
 
-    private static String toString(Object obj) {
+    private static String toJSON(Object obj) {
         if (obj == null) return null;
 
         try {

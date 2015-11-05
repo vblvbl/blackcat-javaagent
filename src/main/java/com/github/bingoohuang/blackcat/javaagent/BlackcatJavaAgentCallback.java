@@ -66,12 +66,12 @@ public abstract class BlackcatJavaAgentCallback {
         return rt;
     }
 
-    public final void doThrowableCaught(BlackcatMethodRt rt, Throwable throwable) {
+    public final void doThrowableCaught(BlackcatMethodRt rt, Throwable throwableCaught) {
         if (ALREADY_NOTIFIED_FLAG.get()) return;
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
-            rt.setThrowable(throwable);
+            rt.setThrowableCaught(throwableCaught);
             onThrowableCaught(rt);
         } catch (Throwable th) {
             th.printStackTrace(System.err);
@@ -85,7 +85,7 @@ public abstract class BlackcatJavaAgentCallback {
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
-            rt.setThrowable(throwable);
+            rt.setThrowableUncaught(throwable);
             onThrowableUncaught(rt);
         } catch (Throwable th) {
             th.printStackTrace(System.err);
