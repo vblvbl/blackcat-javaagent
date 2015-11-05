@@ -33,7 +33,8 @@ public class BlackcatInstrument {
     /*
      Callback arguments: Method scope variables
      */
-    protected int methodVarIndex;
+    protected int sourceVarIndex;
+    protected int callbackVarIndex;
     protected int executionIdIndex;
 
     protected LabelNode startNode;
@@ -134,11 +135,18 @@ public class BlackcatInstrument {
                 sig(Object.class, Class.class, String.class, Class[].class), false));
     }
 
-    private void addStoreMethod(InsnList il) {
-        methodVarIndex = getFistAvailablePosition();
-        il.add(new VarInsnNode(Opcodes.ASTORE, methodVarIndex));
+    private void addSourceStore(InsnList il) {
+        sourceVarIndex = getFistAvailablePosition();
+        il.add(new VarInsnNode(Opcodes.ASTORE, sourceVarIndex));
         methodNode.maxLocals++;
     }
+
+    private void addCallbackStore(InsnList il) {
+        callbackVarIndex = getFistAvailablePosition();
+        il.add(new VarInsnNode(Opcodes.ASTORE, callbackVarIndex));
+        methodNode.maxLocals++;
+    }
+
 
     private void addGetCallback(InsnList il) {
         il.add(new LdcInsnNode(callbackId));
@@ -151,10 +159,12 @@ public class BlackcatInstrument {
         InsnList il = new InsnList();
         int methodParametersIndex = addMethodParametersVariable(il);
         addGetMethodInvocation(il);
-        addStoreMethod(il);
+        addSourceStore(il);
         addGetCallback(il);
+        addCallbackStore(il);
 
-        il.add(new VarInsnNode(ALOAD, methodVarIndex));
+        il.add(new VarInsnNode(ALOAD, callbackVarIndex));
+        il.add(new VarInsnNode(ALOAD, sourceVarIndex));
         il.add(new VarInsnNode(ALOAD, methodParametersIndex));
         il.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
                 p(BlackcatJavaAgentCallback.class), "onStart",
@@ -222,8 +232,8 @@ public class BlackcatInstrument {
         int exceptionVariablePosition = getFistAvailablePosition();
         il.add(new VarInsnNode(ASTORE, exceptionVariablePosition));
         methodOffset++; // Actualizamos el offset
-        addGetCallback(il);
-        il.add(new VarInsnNode(ALOAD, methodVarIndex));
+        il.add(new VarInsnNode(ALOAD, callbackVarIndex));
+        il.add(new VarInsnNode(ALOAD, sourceVarIndex));
         il.add(new VarInsnNode(ALOAD, exceptionVariablePosition));
         il.add(new VarInsnNode(ALOAD, executionIdIndex));
         il.add(new MethodInsnNode(INVOKEVIRTUAL,
@@ -242,8 +252,8 @@ public class BlackcatInstrument {
 
     private InsnList getVoidReturnTraceInsts() {
         InsnList il = new InsnList();
-        addGetCallback(il);
-        il.add(new VarInsnNode(ALOAD, methodVarIndex));
+        il.add(new VarInsnNode(ALOAD, callbackVarIndex));
+        il.add(new VarInsnNode(ALOAD, sourceVarIndex));
         il.add(new VarInsnNode(ALOAD, executionIdIndex));
         il.add(new MethodInsnNode(INVOKEVIRTUAL,
                 p(BlackcatJavaAgentCallback.class), "onVoidFinish",
@@ -259,8 +269,8 @@ public class BlackcatInstrument {
         il.add(new VarInsnNode(ASTORE, exceptionVariablePosition));
 
         methodOffset++; // Actualizamos el offset
-        addGetCallback(il);
-        il.add(new VarInsnNode(ALOAD, methodVarIndex));
+        il.add(new VarInsnNode(ALOAD, callbackVarIndex));
+        il.add(new VarInsnNode(ALOAD, sourceVarIndex));
         il.add(new VarInsnNode(ALOAD, exceptionVariablePosition));
         il.add(new VarInsnNode(ALOAD, executionIdIndex));
         il.add(new MethodInsnNode(INVOKEVIRTUAL,
@@ -279,8 +289,8 @@ public class BlackcatInstrument {
         il.add(getStoreInst(methodReturnType, retunedVariablePosition));
 
         variableCreated(methodReturnType); // Actualizamos el offset
-        addGetCallback(il);
-        il.add(new VarInsnNode(ALOAD, methodVarIndex));
+        il.add(new VarInsnNode(ALOAD, callbackVarIndex));
+        il.add(new VarInsnNode(ALOAD, sourceVarIndex));
         il.add(getLoadInst(methodReturnType, retunedVariablePosition));
         MethodInsnNode mNode = getWrapperCtorInst(methodReturnType);
         if (mNode != null) {
