@@ -34,7 +34,7 @@ public class Helper {
         }
     }
 
-    public static int getArgumentPosition(int offset, Type[] arguments, int argNo) {
+    public static int getArgPosition(int offset, Type[] arguments, int argNo) {
         int ret = argNo + offset;
         for (int i = 0; i < arguments.length && i < argNo; i++) {
             char charType = arguments[i].getDescriptor().charAt(0);

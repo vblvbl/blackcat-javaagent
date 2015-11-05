@@ -34,7 +34,8 @@ public abstract class BlackcatJavaAgentCallback {
         return INSTANCES.get(id);
     }
 
-    public static void registerCallback(String id, BlackcatJavaAgentCallback blackcatJavaAgentCallback) {
+    public static void registerCallback(
+            String id, BlackcatJavaAgentCallback blackcatJavaAgentCallback) {
         if (INSTANCES.containsKey(id))
             throw new IllegalArgumentException(id + " already registered");
 
@@ -49,27 +50,29 @@ public abstract class BlackcatJavaAgentCallback {
     }
 
 
-    public final String onStart(Object source, Object[] arg) {
+    public final BlackcatMethodRt doStart(Object source, Object[] args) {
         if (ALREADY_NOTIFIED_FLAG.get()) return null;
 
         ALREADY_NOTIFIED_FLAG.set(true);
         String executionId = getExecutionId();
+        BlackcatMethodRt rt = new BlackcatMethodRt(executionId, source, args);
         try {
-            doOnStart(source, arg, executionId);
+            onStart(rt);
         } catch (Throwable th) {
             th.printStackTrace(System.err);
         } finally {
             ALREADY_NOTIFIED_FLAG.set(false);
         }
-        return executionId;
+        return rt;
     }
 
-    public final void onThrowableThrown(Object source, Throwable throwable, String executionId) {
+    public final void doThrowableCaught(BlackcatMethodRt rt, Throwable throwable) {
         if (ALREADY_NOTIFIED_FLAG.get()) return;
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
-            doOnThrowableThrown(source, throwable, executionId);
+            rt.setThrowable(throwable);
+            onThrowableCaught(rt);
         } catch (Throwable th) {
             th.printStackTrace(System.err);
         } finally {
@@ -77,12 +80,13 @@ public abstract class BlackcatJavaAgentCallback {
         }
     }
 
-    public final void onThrowableUncaught(Object source, Throwable throwable, String executionId) {
+    public final void doThrowableUncaught(BlackcatMethodRt rt, Throwable throwable) {
         if (ALREADY_NOTIFIED_FLAG.get()) return;
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
-            doOnThrowableUncaught(source, throwable, executionId);
+            rt.setThrowable(throwable);
+            onThrowableUncaught(rt);
         } catch (Throwable th) {
             th.printStackTrace(System.err);
         } finally {
@@ -90,16 +94,17 @@ public abstract class BlackcatJavaAgentCallback {
         }
     }
 
-    public final void onVoidFinish(Object source, String executionId) {
-        onFinish(source, null, executionId);
+    public final void doVoidFinish(BlackcatMethodRt rt) {
+        doFinish(rt, "<void>");
     }
 
-    public final void onFinish(Object source, Object result, String executionId) {
+    public final void doFinish(BlackcatMethodRt rt, Object result) {
         if (ALREADY_NOTIFIED_FLAG.get()) return;
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
-            doOnFinish(source, result, executionId);
+            rt.setResult(result);
+            onFinish(rt);
         } catch (Throwable th) {
             th.printStackTrace(System.err);
         } finally {
@@ -107,11 +112,11 @@ public abstract class BlackcatJavaAgentCallback {
         }
     }
 
-    protected abstract void doOnStart(Object source, Object[] arg, String executionId);
+    protected abstract void onStart(BlackcatMethodRt rt);
 
-    protected abstract void doOnThrowableThrown(Object source, Throwable throwable, String executionId);
+    protected abstract void onThrowableCaught(BlackcatMethodRt rt);
 
-    protected abstract void doOnThrowableUncaught(Object source, Throwable throwable, String executionId);
+    protected abstract void onThrowableUncaught(BlackcatMethodRt rt);
 
-    protected abstract void doOnFinish(Object source, Object result, String executionId);
+    protected abstract void onFinish(BlackcatMethodRt rt);
 }

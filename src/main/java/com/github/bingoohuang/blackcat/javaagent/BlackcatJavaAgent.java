@@ -23,7 +23,8 @@ public class BlackcatJavaAgent {
             }
             String[] tokens = agentArgs.split(";", 2);
             Class<?> clazz = BlackcatJavaAgent.class.getClassLoader().loadClass(tokens[0]);
-            final BlackcatJavaAgentInterceptor interceptor = (BlackcatJavaAgentInterceptor) clazz.newInstance();
+            BlackcatJavaAgentInterceptor interceptor;
+            interceptor = (BlackcatJavaAgentInterceptor) clazz.newInstance();
             interceptor.init(tokens.length == 2 ? tokens[1] : null);
             BlackcatJavaAgentCallback.registerCallback(callbackId, interceptor);
 
