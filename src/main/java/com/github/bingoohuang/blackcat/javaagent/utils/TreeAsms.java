@@ -1,8 +1,11 @@
 package com.github.bingoohuang.blackcat.javaagent.utils;
 
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+
+import static com.github.bingoohuang.blackcat.javaagent.utils.Asms.ci;
+import static com.github.bingoohuang.blackcat.javaagent.utils.Asms.sig;
+import static org.objectweb.asm.Opcodes.*;
 
 public class TreeAsms {
     public static VarInsnNode getLoadInst(Type type, int position) {
@@ -13,20 +16,20 @@ public class TreeAsms {
             case 'I':
             case 'Z':
             case 'S':
-                opCode = Opcodes.ILOAD;
+                opCode = ILOAD;
                 break;
             case 'D':
-                opCode = Opcodes.DLOAD;
+                opCode = DLOAD;
                 break;
             case 'F':
-                opCode = Opcodes.FLOAD;
+                opCode = FLOAD;
                 break;
             case 'J':
-                opCode = Opcodes.LLOAD;
+                opCode = LLOAD;
                 break;
             case 'L':
             case '[':
-                opCode = Opcodes.ALOAD;
+                opCode = ALOAD;
                 break;
             default:
                 throw new ClassFormatError("Invalid method signature: "
@@ -36,7 +39,7 @@ public class TreeAsms {
         return new VarInsnNode(opCode, position);
     }
 
-    public static InsnList getClassReferenceInstruction(Type type, int majorVersion) {
+    public static InsnList getClassRefInst(Type type, int majorVersion) {
         InsnList list = new InsnList();
         char charType = type.getDescriptor().charAt(0);
         String wrapper;
@@ -61,7 +64,7 @@ public class TreeAsms {
                 break;
             case 'L':
             case '[':
-                return getClassConstantReference(type, majorVersion);
+                return getClassConstantRef(type, majorVersion);
             case 'Z':
                 wrapper = "java/lang/Boolean";
                 break;
@@ -73,12 +76,12 @@ public class TreeAsms {
                         + type.getDescriptor());
         }
 
-        list.add(new FieldInsnNode(Opcodes.GETSTATIC, wrapper, "TYPE", "Ljava/lang/Class;"));
+        list.add(new FieldInsnNode(GETSTATIC, wrapper, "TYPE", ci(Class.class)));
         return list;
 
     }
 
-    public static MethodInsnNode getWrapperContructionInst(Type type) {
+    public static MethodInsnNode getWrapperCtorInst(Type type) {
 
         char charType = type.getDescriptor().charAt(0);
         String wrapper;
@@ -116,7 +119,7 @@ public class TreeAsms {
                         + type.getDescriptor());
         }
 
-        return new MethodInsnNode(Opcodes.INVOKESTATIC, wrapper, "valueOf",
+        return new MethodInsnNode(INVOKESTATIC, wrapper, "valueOf",
                 "(" + charType + ")L" + wrapper + ";", false);
 
     }
@@ -129,20 +132,20 @@ public class TreeAsms {
             case 'I':
             case 'Z':
             case 'S':
-                opCode = Opcodes.ISTORE;
+                opCode = ISTORE;
                 break;
             case 'D':
-                opCode = Opcodes.DSTORE;
+                opCode = DSTORE;
                 break;
             case 'F':
-                opCode = Opcodes.FSTORE;
+                opCode = FSTORE;
                 break;
             case 'J':
-                opCode = Opcodes.LSTORE;
+                opCode = LSTORE;
                 break;
             case 'L':
             case '[':
-                opCode = Opcodes.ASTORE;
+                opCode = ASTORE;
                 break;
             default:
                 throw new ClassFormatError("Invalid method signature: "
@@ -151,42 +154,41 @@ public class TreeAsms {
         return new VarInsnNode(opCode, position);
     }
 
-    public static AbstractInsnNode getPushInstruction(int value) {
+    public static AbstractInsnNode getPushInst(int value) {
         if (value == -1) {
-            return new InsnNode(Opcodes.ICONST_M1);
+            return new InsnNode(ICONST_M1);
         } else if (value == 0) {
-            return new InsnNode(Opcodes.ICONST_0);
+            return new InsnNode(ICONST_0);
         } else if (value == 1) {
-            return new InsnNode(Opcodes.ICONST_1);
+            return new InsnNode(ICONST_1);
         } else if (value == 2) {
-            return new InsnNode(Opcodes.ICONST_2);
+            return new InsnNode(ICONST_2);
         } else if (value == 3) {
-            return new InsnNode(Opcodes.ICONST_3);
+            return new InsnNode(ICONST_3);
         } else if (value == 4) {
-            return new InsnNode(Opcodes.ICONST_4);
+            return new InsnNode(ICONST_4);
         } else if (value == 5) {
-            return new InsnNode(Opcodes.ICONST_5);
+            return new InsnNode(ICONST_5);
         } else if ((value >= -128) && (value <= 127)) {
-            return new IntInsnNode(Opcodes.BIPUSH, value);
+            return new IntInsnNode(BIPUSH, value);
         } else if ((value >= -32768) && (value <= 32767)) {
-            return new IntInsnNode(Opcodes.SIPUSH, value);
+            return new IntInsnNode(SIPUSH, value);
         } else {
             return new LdcInsnNode(value);
         }
     }
 
-    public static InsnList getClassConstantReference(Type type, int majorVersion) {
+    public static InsnList getClassConstantRef(Type type, int majorVersion) {
         InsnList il = new InsnList();
 
-        if (majorVersion >= Opcodes.V1_5) {
+        if (majorVersion >= V1_5) {
             il.add(new LdcInsnNode(type));
-
         } else {
             String fullyQualifiedName = type.getInternalName().replaceAll("/", ".");
             il.add(new LdcInsnNode(fullyQualifiedName));
-            il.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+            il.add(new MethodInsnNode(INVOKESTATIC,
                     "java/lang/Class", "forName",
-                    "(Ljava/lang/String;)Ljava/lang/Class;", false));
+                    sig(Class.class, String.class), false));
         }
         return il;
     }

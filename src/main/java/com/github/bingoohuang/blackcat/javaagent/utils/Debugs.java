@@ -1,10 +1,11 @@
 package com.github.bingoohuang.blackcat.javaagent.utils;
 
 import com.github.bingoohuang.blackcat.javaagent.BlackcatCreateTransformedClassFile;
+import com.google.common.io.Files;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,14 +16,13 @@ public class Debugs {
             ClassNode cn, String className, byte[] bytes) {
         if (!shouldCreateTransformedClassFile(cn)) return;
 
+        writeClassFile(className, bytes);
+    }
+
+    private static void writeClassFile(String className, byte[] bytes) {
         try {
-            String name = Asms.c(className) + ".class";
-            FileOutputStream fos = new FileOutputStream(name, true);
-            try {
-                fos.write(bytes);
-            } finally {
-                fos.close();
-            }
+            String classFilename = Asms.c(className) + ".class";
+            Files.write(bytes, new File(classFilename));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
