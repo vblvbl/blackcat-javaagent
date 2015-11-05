@@ -135,20 +135,13 @@ public class BlackcatInstrument {
                 sig(Object.class, Class.class, String.class, Class[].class), false));
     }
 
-    private int addSourceStore(InsnList insnList) {
-        int sourceVarIndex = getFistAvailablePosition();
-        insnList.add(new VarInsnNode(ASTORE, sourceVarIndex));
+    private int addVarStore(InsnList insnList) {
+        int varIndex = getFistAvailablePosition();
+        insnList.add(new VarInsnNode(ASTORE, varIndex));
         methodNode.maxLocals++;
 
-        return sourceVarIndex;
+        return varIndex;
     }
-
-    private void addCallbackStore(InsnList insnList) {
-        callbackVarIndex = getFistAvailablePosition();
-        insnList.add(new VarInsnNode(ASTORE, callbackVarIndex));
-        methodNode.maxLocals++;
-    }
-
 
     private void addGetCallback(InsnList insnList) {
         insnList.add(new LdcInsnNode(callbackId));
@@ -161,9 +154,9 @@ public class BlackcatInstrument {
         InsnList insnList = new InsnList();
         int methodParametersIndex = addMethodParametersVariable(insnList);
         addGetMethodInvocation(insnList);
-        int sourceVarIndex = addSourceStore(insnList);
+        int sourceVarIndex = addVarStore(insnList);
         addGetCallback(insnList);
-        addCallbackStore(insnList);
+        callbackVarIndex = addVarStore(insnList);
 
         insnList.add(new VarInsnNode(ALOAD, callbackVarIndex));
         insnList.add(new VarInsnNode(ALOAD, sourceVarIndex));
