@@ -184,7 +184,8 @@ public class TreeAsms {
         if (majorVersion >= V1_5) {
             il.add(new LdcInsnNode(type));
         } else {
-            String fullyQualifiedName = type.getInternalName().replaceAll("/", ".");
+            String internalName = type.getInternalName();
+            String fullyQualifiedName = internalName.replaceAll("/", ".");
             il.add(new LdcInsnNode(fullyQualifiedName));
             il.add(new MethodInsnNode(INVOKESTATIC,
                     "java/lang/Class", "forName",

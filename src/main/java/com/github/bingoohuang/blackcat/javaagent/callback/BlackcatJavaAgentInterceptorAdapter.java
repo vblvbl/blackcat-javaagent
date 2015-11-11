@@ -1,4 +1,4 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.callback;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -10,7 +10,7 @@ public class BlackcatJavaAgentInterceptorAdapter extends BlackcatJavaAgentInterc
     }
 
     @Override
-    public boolean interceptClass(String className, byte[] byteCode) {
+    public boolean interceptClass(ClassNode classNode, String className) {
         return true;
     }
 

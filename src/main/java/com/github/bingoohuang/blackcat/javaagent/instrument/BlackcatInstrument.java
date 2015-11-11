@@ -1,5 +1,8 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.instrument;
 
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatJavaAgentCallback;
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatJavaAgentInterceptor;
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatMethodRt;
 import com.github.bingoohuang.blackcat.javaagent.utils.Debugs;
 import com.github.bingoohuang.blackcat.javaagent.utils.Helper;
 import org.objectweb.asm.ClassReader;
@@ -48,13 +51,14 @@ public class BlackcatInstrument {
     }
 
     public byte[] modifyClass() {
-        boolean ok = interceptor.interceptClass(className, classFileBuffer);
-        if (!ok) return classFileBuffer;
-
         classNode = new ClassNode();
         ClassReader cr = new ClassReader(classFileBuffer);
         cr.accept(classNode, 0);
         classType = Type.getType("L" + classNode.name + ";");
+
+        boolean ok = interceptor.interceptClass(classNode, className);
+        if (!ok) return classFileBuffer;
+
 
         int count = modifyMethodCount(classNode.methods);
         if (count == 0) return classFileBuffer;
@@ -122,13 +126,16 @@ public class BlackcatInstrument {
         int parameterClassesIndex = getFistAvailablePosition();
         il.add(new VarInsnNode(ASTORE, parameterClassesIndex));
         methodNode.maxLocals++;
+        int majorVersion = classNode.version & 0xFFFF;
+
         for (int i = 0; i < methodArgs.length; i++) {
             il.add(new VarInsnNode(ALOAD, parameterClassesIndex));
             il.add(getPushInst(i));
-            il.add(getClassRefInst(methodArgs[i], classNode.version & 0xFFFF));
+            il.add(getClassRefInst(methodArgs[i], majorVersion));
             il.add(new InsnNode(AASTORE));
         }
-        il.add(getClassConstantRef(classType, classNode.version & 0xFFFF));
+
+        il.add(getClassConstantRef(classType, majorVersion));
         il.add(new LdcInsnNode(methodNode.name));
         il.add(new VarInsnNode(ALOAD, parameterClassesIndex));
         il.add(new MethodInsnNode(INVOKESTATIC, p(Helper.class), "getSource",
@@ -227,6 +234,7 @@ public class BlackcatInstrument {
         int exceptionVariablePosition = getFistAvailablePosition();
         insnList.add(new VarInsnNode(ASTORE, exceptionVariablePosition));
         methodOffset++;
+
         insnList.add(new VarInsnNode(ALOAD, callbackVarIndex));
         insnList.add(new VarInsnNode(ALOAD, rtIndex));
         insnList.add(new VarInsnNode(ALOAD, exceptionVariablePosition));

@@ -1,8 +1,5 @@
 package com.github.bingoohuang.blackcat.javaagent.logging;
 
-import com.github.bingoohuang.blackcat.javaagent.BlackcatCreateTransformedClassFile;
-
-@BlackcatCreateTransformedClassFile
 public class DemoClass {
 
     public static String sayHello(String name) {
@@ -32,10 +29,18 @@ public class DemoClass {
 
     public void trycatch() {
         try {
+            throw new RuntimeException("abc");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void rethrow() {
+        try {
             int a = 1 / 0;
             System.out.println(a);
         } catch (RuntimeException ex) {
-            System.out.println(ex.toString());
+            System.out.println("aaaa" + ex.toString());
             throw ex;
         } finally {
             System.out.println("finally");

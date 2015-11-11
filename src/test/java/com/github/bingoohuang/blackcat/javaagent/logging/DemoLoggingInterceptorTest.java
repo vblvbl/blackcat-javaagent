@@ -13,6 +13,8 @@ public class DemoLoggingInterceptorTest {
         DemoClass demoClass = new DemoClass();
         demoClass.now();
 
+        demoClass.trycatch();
+
         try {
             demoClass.ex();
         } catch (RuntimeException e) {
@@ -20,7 +22,7 @@ public class DemoLoggingInterceptorTest {
         }
 
         try {
-            demoClass.trycatch();
+            demoClass.rethrow();
         } catch (ArithmeticException e) {
             // ignore
         }

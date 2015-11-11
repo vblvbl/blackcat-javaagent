@@ -1,5 +1,4 @@
-package com.github.bingoohuang.blackcat.javaagent;
-
+package com.github.bingoohuang.blackcat.javaagent.annotations;
 
 import java.lang.annotation.*;
 

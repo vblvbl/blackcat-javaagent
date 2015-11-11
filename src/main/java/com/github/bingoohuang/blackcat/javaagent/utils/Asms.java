@@ -1,6 +1,51 @@
 package com.github.bingoohuang.blackcat.javaagent.utils;
 
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
+
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 public class Asms {
+    public static boolean isAnyMethodAnnotationPresent(
+            List<MethodNode> methods, Class<? extends Annotation> annotationClass) {
+        for (MethodNode mn : methods) {
+            if (isAnnotationPresent(mn, annotationClass)) return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isAnnotationPresent(
+            ClassNode cn,
+            Class<? extends Annotation> annotationClass) {
+        List<AnnotationNode> visibleAnnotations = cn.visibleAnnotations;
+        return isAnnotationPresent(annotationClass, visibleAnnotations);
+    }
+
+    public static boolean isAnnotationPresent(
+            MethodNode mn,
+            Class<? extends Annotation> annotationClass) {
+        List<AnnotationNode> visibleAnnotations = mn.visibleAnnotations;
+        return isAnnotationPresent(annotationClass, visibleAnnotations);
+    }
+
+
+    private static boolean isAnnotationPresent(
+            Class<? extends Annotation> annotationClass,
+            List<AnnotationNode> visibleAnnotations) {
+        if (visibleAnnotations == null) return false;
+
+        String expectedDesc = ci(annotationClass);
+        for (AnnotationNode visibleAnnotation : visibleAnnotations) {
+            if (expectedDesc.equals(visibleAnnotation.desc)) return true;
+        }
+
+        return false;
+    }
+
+
     // Creates a dotted class name from a path/package name
     public static String c(String p) {
         return p.replace('/', '.');
@@ -112,4 +157,5 @@ public class Asms {
 
         return signature.toString();
     }
+
 }

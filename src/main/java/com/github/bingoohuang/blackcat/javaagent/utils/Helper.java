@@ -14,7 +14,9 @@ import org.objectweb.asm.util.Textifier;
 import org.objectweb.asm.util.TraceMethodVisitor;
 
 public class Helper {
-    public static Object getSource(Class declaringClass, String name,
+    public static Object getSource(
+            Class declaringClass,
+            String name,
             Class... paramTypes) {
         if (name.equals("<init>")) {
             try {

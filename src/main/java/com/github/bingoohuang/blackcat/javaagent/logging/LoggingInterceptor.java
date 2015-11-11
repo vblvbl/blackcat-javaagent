@@ -1,8 +1,8 @@
 package com.github.bingoohuang.blackcat.javaagent.logging;
 
 import com.alibaba.fastjson.JSON;
-import com.github.bingoohuang.blackcat.javaagent.BlackcatJavaAgentInterceptor;
-import com.github.bingoohuang.blackcat.javaagent.BlackcatMethodRt;
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatJavaAgentInterceptor;
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatMethodRt;
 import com.google.common.io.Files;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
@@ -37,7 +37,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
     }
 
     @Override
-    public boolean interceptClass(String className, byte[] byteCode) {
+    public boolean interceptClass(ClassNode classNode, String className) {
         return className.endsWith("DemoClass");
     }
 
@@ -49,7 +49,7 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
     @Override
     protected void onStart(BlackcatMethodRt rt) {
         File file = getFile(rt);
-        trace(file, "#onStart:");
+        trace(file, "#onStart:" + rt.executionId);
         trace(file, "#Source: " + rt.source);
         trace(file, "#Start: " + new Date(rt.startNano));
         trace(file, "#Parameters:" + toJSON(rt.args));
@@ -57,10 +57,9 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onThrowableCaught(BlackcatMethodRt rt) {
-        long cost = System.nanoTime() - rt.startNano;
         File file = getFile(rt);
-        trace(file, "#onThrowableCaught:");
-        trace(file, "#Elapsed: " + cost + " ns");
+        trace(file, "#onThrowableCaught:" + rt.executionId);
+        trace(file, "#Elapsed: " + rt.costNano + " ns");
         trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
         trace(file, "#Catch:" + rt.throwableCaught);
         trace(file, "#Catch JSON:" + toJSON(rt.throwableCaught));
@@ -68,24 +67,22 @@ public class LoggingInterceptor extends BlackcatJavaAgentInterceptor {
 
     @Override
     protected void onThrowableUncaught(BlackcatMethodRt rt) {
-        long cost = System.nanoTime() - rt.startNano;
         File file = getFile(rt);
-        trace(file, "#onThrowableUncaught:");
-        trace(file, "#Elapsed: " + cost + " ns");
+        trace(file, "#onThrowableUncaught:" + rt.executionId);
+        trace(file, "#Elapsed: " + rt.costNano + " ns");
         trace(file, "#SAME:" + (rt.throwableUncaught == rt.throwableCaught));
         trace(file, "#Thrown:" + rt.throwableUncaught);
         trace(file, "#ThrownJSON:" + toJSON(rt.throwableCaught));
-        trace(file, "\n\n");
+        trace(file, "End of onThrowableUncaught\n\n");
     }
 
     @Override
     protected void onFinish(BlackcatMethodRt rt) {
-        long cost = System.nanoTime() - rt.startNano;
         File file = getFile(rt);
-        trace(file, "#onFinish:");
-        trace(file, "#Elapsed: " + cost + " ns");
+        trace(file, "#onFinish:" + rt.executionId);
+        trace(file, "#Elapsed: " + rt.costNano + " ns");
         trace(file, "#Returned:" + toJSON(rt.result));
-        trace(file, "\n\n");
+        trace(file, "End of onFinish\n\n");
     }
 
     private static void trace(File f, String s) {

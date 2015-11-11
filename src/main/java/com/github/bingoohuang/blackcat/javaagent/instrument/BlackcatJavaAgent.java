@@ -1,4 +1,8 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.instrument;
+
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatClientInterceptor;
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatJavaAgentCallback;
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatJavaAgentInterceptor;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -11,15 +15,16 @@ public class BlackcatJavaAgent {
     private static int counter;
 
     public static void premain(
-            final String agentArgs, Instrumentation instrumentation
+            String agentArgs, Instrumentation instrumentation
     ) throws InstantiationException {
         ++counter;
         final String callbackId = String.valueOf(counter);
         try {
             if (agentArgs == null) {
-                throw new IllegalArgumentException(
-                        "Agent argument is required of the form " +
-                                "'interceptor-class-name[;interceptor-custom-args]'");
+                agentArgs = BlackcatClientInterceptor.class.getName();
+//                throw new IllegalArgumentException(
+//                        "Agent argument is required of the form " +
+//                                "'interceptor-class-name[;interceptor-custom-args]'");
             }
             String[] tokens = agentArgs.split(";", 2);
             Class<?> clazz = BlackcatJavaAgent.class.getClassLoader().loadClass(tokens[0]);

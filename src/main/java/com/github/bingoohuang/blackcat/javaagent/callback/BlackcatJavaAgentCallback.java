@@ -1,4 +1,4 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.callback;
 
 
 import java.util.HashMap;
@@ -27,6 +27,7 @@ public abstract class BlackcatJavaAgentCallback {
     private final String getExecutionId() {
         int counter = COUNTER.get();
         COUNTER.set(counter + 1);
+
         return Thread.currentThread().getId() + ":" + counter;
     }
 
@@ -49,7 +50,6 @@ public abstract class BlackcatJavaAgentCallback {
         INSTANCES.remove(id);
     }
 
-
     public final BlackcatMethodRt doStart(Object source, Object[] args) {
         if (ALREADY_NOTIFIED_FLAG.get()) return null;
 
@@ -68,6 +68,7 @@ public abstract class BlackcatJavaAgentCallback {
 
     public final void doThrowableCaught(BlackcatMethodRt rt, Throwable throwableCaught) {
         if (ALREADY_NOTIFIED_FLAG.get()) return;
+        if (rt.throwableCaught == throwableCaught) return;
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
@@ -85,6 +86,7 @@ public abstract class BlackcatJavaAgentCallback {
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
+            rt.finishExecute();
             rt.setThrowableUncaught(throwable);
             onThrowableUncaught(rt);
         } catch (Throwable th) {
@@ -103,6 +105,7 @@ public abstract class BlackcatJavaAgentCallback {
 
         ALREADY_NOTIFIED_FLAG.set(true);
         try {
+            rt.finishExecute();
             rt.setResult(result);
             onFinish(rt);
         } catch (Throwable th) {

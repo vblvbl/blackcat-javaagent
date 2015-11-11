@@ -1,12 +1,11 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.callback;
 
-import org.apache.commons.io.IOUtils;
 import com.github.bingoohuang.blackcat.javaagent.utils.Helper;
+import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.util.Date;
 
-@BlackcatCreateTransformedClassFile
 public class SimpleClass {
 
     public static final String GREETING = "Hello world";

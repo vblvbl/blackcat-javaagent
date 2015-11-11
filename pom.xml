@@ -73,6 +73,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.bingoohuang</groupId>
+            <artifactId>blackcat-sdk</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
@@ -166,7 +176,7 @@
                     <appendAssemblyId>true</appendAssemblyId>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.github.bingoohuang.blackcat.javaagent.BlackcatJavaAgent</Premain-Class>
+                            <Premain-Class>com.github.bingoohuang.blackcat.javaagent.instrument.BlackcatJavaAgent</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>

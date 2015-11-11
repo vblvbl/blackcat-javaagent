@@ -1,5 +1,6 @@
-package com.github.bingoohuang.blackcat.javaagent;
+package com.github.bingoohuang.blackcat.javaagent.callback;
 
+import com.github.bingoohuang.blackcat.javaagent.callback.BlackcatJavaAgentCallback;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -24,15 +25,14 @@ public abstract class BlackcatJavaAgentInterceptor extends BlackcatJavaAgentCall
     /**
      * When to instrument a class based on its name.
      *
-     *
+     * @param classNode 类节点
      * @param className the name of the class in the internal form of fully
      *                  qualified class and interface names as defined in
      *                  <i>The Java Virtual Machine Specification</i>. For example,
      *                  <code>"java/util/List"</code>.
-     * @param byteCode  the input byte buffer in class file format
      * @return 是否拦截类
      */
-    public abstract boolean interceptClass(String className, byte[] byteCode);
+    public abstract boolean interceptClass(ClassNode classNode, String className);
 
     /**
      * When to instrument a method of a class based on their ASM representation
